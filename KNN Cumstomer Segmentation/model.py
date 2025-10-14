@@ -17,11 +17,15 @@ path_scaler_relative=os.getenv('SCALER_PATH')
 path_model=os.path.join(BASE_DIR, path_model_relative)
 path_scaler=os.path.join(BASE_DIR, path_scaler_relative)
 
-with open(path_model, 'rb') as file:
-    model=pickle.load(file)
+try:
+    with open(path_model, 'rb') as file:
+        model = pickle.load(file)
 
-with open(path_scaler, 'rb') as file:
-    scaler=pickle.load(file)
+    with open(path_scaler, 'rb') as file:
+        scaler = pickle.load(file)
+except FileNotFoundError as e:
+    raise RuntimeError("Model or scaler file not found. Ensure .env paths are correct.") from e
+
     
 def predict(input_tuple):
     """Predict the customer segment for the input features."""
@@ -44,4 +48,3 @@ def predict(input_tuple):
         
     return descriptive_labels[prediction[0]]
 #age, annual income, spending score, gender
-print(predict([20,10,1,1]))
