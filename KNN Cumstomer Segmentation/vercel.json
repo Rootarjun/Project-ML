@@ -1,14 +1,14 @@
 {
   "builds": [
     {
-      "src": "KNN Cumstomer Segmentation/main.py",
+      "src": "main.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "KNN Cumstomer Segmentation/main.py"
+      "dest": "main.py"
     }
   ]
 }
