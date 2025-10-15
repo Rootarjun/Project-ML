@@ -1,6 +1,7 @@
-# requirements.txt
-fastapi
-uvicorn
-pydantic
-python-dotenv
+numpy
+pandas
+matplotlib
+seaborn
 scikit-learn
+dotenv
+fastapi[all]
