@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Segment Predictor</title>
+    <style>
+        /* Google Font for a modern look */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        /* Basic Reset & Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Main Container Card */
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box; /* Important for padding */
+        }
+
+        /* Button Styling */
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        /* Result Display Area */
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            min-height: 30px; /* Prevents layout shift */
+        }
+        
+        .result-success {
+            background-color: #e8f5e9; /* Light green */
+            color: #2e7d32; /* Dark green */
+        }
+        
+        .result-error {
+            background-color: #ffebee; /* Light red */
+            color: #c62828; /* Dark red */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Customer Segment Predictor</h1>
+        <form id="prediction-form">
+            <div class="form-group">
+                <label for="age">Age</label>
+                <input type="number" id="age" name="age" placeholder="e.g., 35" required>
+            </div>
+            <div class="form-group">
+                <label for="annual_income">Annual Income (k$)</label>
+                <input type="number" id="annual_income" name="annual_income" placeholder="e.g., 75" required>
+            </div>
+            <div class="form-group">
+                <label for="spending_score">Spending Score (1-100)</label>
+                <input type="number" id="spending_score" name="spending_score" placeholder="e.g., 88" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                    <option value="1">Female</option>
+                    <option value="0">Male</option>
+                </select>
+            </div>
+            <button type="submit" id="submit-button">Predict Segment</button>
+        </form>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Get references to our HTML elements
+        const form = document.getElementById('prediction-form');
+        const resultDiv = document.getElementById('result');
+        const submitButton = document.getElementById('submit-button');
+
+        // Add an event listener for the form submission
+        form.addEventListener('submit', async function(event) {
+            // Prevent the form from reloading the page
+            event.preventDefault(); 
+            
+            // Show a loading state
+            submitButton.disabled = true;
+            submitButton.innerText = 'Predicting...';
+            resultDiv.innerHTML = ''; // Clear previous result
+            resultDiv.className = ''; // Clear previous styling
+
+            // Get data from the form
+            const formData = new FormData(form);
+            const data = {
+                age: parseInt(formData.get('age')),
+                annual_income: parseInt(formData.get('annual_income')),
+                spending_score: parseInt(formData.get('spending_score')),
+                gender: parseInt(formData.get('gender'))
+            };
+
+            // Send data to your LOCAL API using fetch
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                
+                // Display the result
+                resultDiv.innerHTML = `Predicted Segment: <br><strong>${result.predicted_segment}</strong>`;
+                resultDiv.className = 'result-success';
+
+            } catch (error) {
+                // Handle errors
+                resultDiv.innerHTML = `<strong>Error:</strong> Could not get a prediction. Please try again.`;
+                resultDiv.className = 'result-error';
+                console.error('Fetch error:', error);
+            } finally {
+                // Restore button state
+                submitButton.disabled = false;
+                submitButton.innerText = 'Predict Segment';
+            }
+        });
+    </script>
+
+</body>
+</html>
