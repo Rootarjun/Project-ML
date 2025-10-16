@@ -1,7 +1,6 @@
-numpy
-pandas
-matplotlib
-seaborn
+# requirements.txt
+fastapi
+uvicorn
+pydantic
+python-dotenv
 scikit-learn
-dotenv
-fastapi[all]
