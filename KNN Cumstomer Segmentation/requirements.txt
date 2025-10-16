@@ -1,6 +1,7 @@
 # requirements.txt
-fastapi
+fastapi[all]
 uvicorn
 pydantic
 python-dotenv
 scikit-learn
+numpy
